@@ -82,7 +82,26 @@ module.exports = class extends Generator {
 };
 ```
 
-EVERY METHOD added to the prototype is run once the generator is called–and usually in sequence. But, as we’ll see in the next section, some special method names will trigger a specific run order.
+Each method directly attached to a Generator prototype is considered to be a task. Each task is run in sequence by the Yeoman environment run loop. In other words, EVERY METHOD added to the prototype is run once the generator is called–and usually in sequence. Each function on the object returned by `Object.getPrototypeOf(Generator)` will be automatically run.
+
+If you have a helper method that shouldn't be called automatically by Yeoman, you can:
+
+- Prefix method name by an underscore (eg. _my_helper_method)
+- Use instance methods (eg. this.helperMethod = function() {...})
+- Extends a parent generator (create a class that extends Generator and another class to extends the first and will implement the helper method)
+
+However, some special method names will trigger a specific run order. Yeoman has a queue system with priority support, it's called "run loop". Priorities are defined in your code as special prototype method names. When a method name is the same as a priority name, the run loop pushes the method into this special queue. If the method name doesn’t match a priority, it is pushed in the default group.
+
+The available priorities are (in running order):
+
+1. initializing - Your initialization methods (checking current project state, getting configs, etc)
+2. prompting - Where you prompt users for options (where you’d call this.prompt())
+3. configuring - Saving configurations and configure the project (creating .editorconfig files and other metadata files)
+4. default - If the method name doesn’t match a priority, it will be pushed to this group.
+5. writing - Where you write the generator specific files (routes, controllers, etc)
+6. conflicts - Where conflicts are handled (used internally)
+7. install - Where installations are run (npm, bower)
+8. end - Called last, cleanup, say good bye, etc
 
 
 ### Creating a subgenerator
