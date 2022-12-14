@@ -83,3 +83,12 @@ module.exports = class extends Generator {
 ```
 
 EVERY METHOD added to the prototype is run once the generator is called–and usually in sequence. But, as we’ll see in the next section, some special method names will trigger a specific run order.
+
+
+### Creating a subgenerator
+
+Once installed Yeoman itself and it's the generator-generator, run:
+
+```bash
+yo generator:subgenerator <subgenerator name>
+```
